@@ -80,6 +80,16 @@ main {
   padding: 0.5rem 0;
 }
 
+.form-field__label-inline {
+  display: inline-block;
+  margin: -4px 0 0 8px;
+  vertical-align: middle;
+  line-height: 1.4;
+  font-weight: normal;
+  cursor: pointer;
+  width: calc(100% - 30px); /* Allows label to wrap properly */
+}
+
 .form-field__note {
   font-size: 0.8rem;
   color: #666;
@@ -93,6 +103,11 @@ main {
   border-radius: 0.25rem;
   box-shadow: inset 0 0.125rem 0.25rem rgb(0 0 0 / 10%);
   width: 100%;
+}
+.checkbox {
+  width: auto;
+  margin: 0;
+  vertical-align: top;
 }
 
 .entry:focus,

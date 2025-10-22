@@ -36,6 +36,16 @@ class Checkout extends Layout
                             </table>
                         </div>
                     </div>
+
+                    <div class="frame">
+                        <div class="frame__contents">
+                            <div class="form-field">
+                                <input type="checkbox" name="rise_and_shine" id="rise_and_shine" class="entry checkbox" />
+                                <label class="form-field__label form-field__label-inline" for="rise_and_shine">With our “Rise & Shine” beta program, you get early access to new features, but they may not always work perfectly. You can change your beta preference at any time after you join.</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="frame">
                         <h2 class="frame__title">Account Details</h2>
                         <div class="frame__contents">
@@ -66,6 +76,7 @@ class Checkout extends Layout
                             </div>
                         </div>
                     </div>
+
                     <div class="frame">
                         <h2 class="frame__title">Billing Address</h2>
                         <div class="frame__contents">
