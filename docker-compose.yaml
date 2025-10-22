@@ -1,4 +1,19 @@
 services:
+
+  php:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    command: php -S 0.0.0.0:8000 src/index.php
+    depends_on:
+      - db
+
   db:
     container_name: silverorange_postgres
     image: postgres:14
@@ -10,5 +25,6 @@ services:
       POSTGRES_DB: "silverorange"
     volumes:
       - db-data:/var/lib/postgresql/data
+
 volumes:
   db-data:
