@@ -28,7 +28,9 @@ class Checkout extends Layout
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Product Thumbnail</td>
+                                        <td>
+                                            <img src="/images/product.png" alt="Lorem Widget Product" class="order-summary__product-image">
+                                        </td>
                                         <td>Lorem Widget</td>
                                         <td>1</td>
                                     </tr>
