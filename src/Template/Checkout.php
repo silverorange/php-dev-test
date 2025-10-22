@@ -120,6 +120,10 @@ class Checkout extends Layout
                             </div>
                         </div>
                     </div>
+
+                    <div class="frame frame-last">
+                        <button type="submit">Place Order</button>
+                    </div>
                 </form>
             HTML;
     }

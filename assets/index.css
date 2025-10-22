@@ -48,7 +48,7 @@ main {
   padding: 2rem 0 0rem;
 }
 
-.frame::after {
+.frame:not(.frame-last)::after {
   content: " ";
   display: block;
   background: #eee;
@@ -132,4 +132,13 @@ main {
     height: auto;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+button,
+input[type="submit"] {
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+  line-height: 1.4;
+  cursor: pointer;
 }
