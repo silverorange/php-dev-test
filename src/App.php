@@ -61,7 +61,11 @@ class App
         if (preg_match('@^/?$@', $path) === 1) {
             $controller = new Controller\Root([], $this->db, null, null);
         } elseif (preg_match('@^/posts/?$@', $path) === 1) {
-            $controller = new Controller\PostIndex([], $this->db, null, null);
+            $controller = new Controller\PostIndex(
+                [],
+                $this->authorRepository,
+                $this->postRepository
+            );
         } elseif (preg_match('@^/posts/([a-f0-9-]+)/?$@', $path, $params) === 1) {
             array_shift($params);
             $controller = new Controller\PostDetails(

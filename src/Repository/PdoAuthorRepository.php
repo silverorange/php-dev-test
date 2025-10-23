@@ -12,10 +12,7 @@ final class PdoAuthorRepository implements AuthorRepositoryInterface
     public function __construct(private readonly PDO $db) {}
 
     /**
-     * Retrieve object from DB record, by ID.
-     *
-     * @param string $id UUID of the author to retrieve
-     * @return ?Author Author instance if found, null otherwise
+     * @inheritDoc
      */
     public function findById(string $id): ?Author
     {

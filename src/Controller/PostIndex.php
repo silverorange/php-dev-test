@@ -2,22 +2,31 @@
 
 namespace silverorange\DevTest\Controller;
 
+use silverorange\DevTest\Repository\AuthorRepositoryInterface;
+use silverorange\DevTest\Repository\PostRepositoryInterface;
 use silverorange\DevTest\Context;
-use silverorange\DevTest\Model\Post;
 use silverorange\DevTest\Template;
+use silverorange\DevTest\ViewModel\PostWithAuthor;
 
 class PostIndex extends Controller
 {
-    /**
-     * @var array<Post>
-     */
-    private array $posts = [];
+    /** @var array<int, PostWithAuthor> $postsWithAuthor */
+    private array $postsWithAuthor = [];
+
+    public function __construct(
+        protected array $params,
+        protected ?AuthorRepositoryInterface $authorRepository,
+        protected ?PostRepositoryInterface $postRepository,
+    ) {
+        parent::__construct($params, null, $authorRepository, $postRepository);
+    }
 
     public function getContext(): Context
     {
         $context = new Context();
         $context->title = 'Posts';
-        $context->content = strval(count($this->posts));
+        $context->postsWithAuthor = $this->postsWithAuthor;
+
         return $context;
     }
 
@@ -28,7 +37,10 @@ class PostIndex extends Controller
 
     protected function loadData(): void
     {
-        // TODO: Load posts from database here.
-        $this->posts = [];
+        if ($this->postRepository === null || $this->authorRepository === null) {
+            return;
+        }
+
+        $this->postsWithAuthor = $this->postRepository->findAllWithAuthor();
     }
 }
