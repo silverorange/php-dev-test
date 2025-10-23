@@ -6,6 +6,8 @@
 
 namespace silverorange\DevTest;
 
+use League\CommonMark\CommonMarkConverter;
+use League\CommonMark\ConverterInterface;
 use PDO;
 use silverorange\DevTest\Controller;
 use silverorange\DevTest\Repository\PdoAuthorRepository;
@@ -16,11 +18,15 @@ class App
     protected PdoAuthorRepository $authorRepository;
     protected PdoPostRepository $postRepository;
 
+    protected ConverterInterface $converter;
+
     public function __construct(
         private readonly PDO $db,
     ) {
         $this->authorRepository = new PdoAuthorRepository($this->db);
         $this->postRepository = new PdoPostRepository($this->db);
+
+        $this->converter = new CommonMarkConverter();
     }
 
     public function run(): bool
@@ -60,9 +66,9 @@ class App
             array_shift($params);
             $controller = new Controller\PostDetails(
                 $params,
-                null,
                 $this->authorRepository,
-                $this->postRepository
+                $this->postRepository,
+                $this->converter
             );
         } elseif (preg_match('@^/checkout/?$@', $path) === 1) {
             $controller = new Controller\Checkout([], $this->db, null, null);

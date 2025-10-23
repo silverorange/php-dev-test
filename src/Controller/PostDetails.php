@@ -2,9 +2,12 @@
 
 namespace silverorange\DevTest\Controller;
 
+use League\CommonMark\ConverterInterface;
 use silverorange\DevTest\Context;
 use silverorange\DevTest\Template;
 use silverorange\DevTest\Model\Post;
+use silverorange\DevTest\Repository\AuthorRepositoryInterface;
+use silverorange\DevTest\Repository\PostRepositoryInterface;
 use silverorange\DevTest\Schema\UuidValidatorTrait;
 
 class PostDetails extends Controller
@@ -13,6 +16,15 @@ class PostDetails extends Controller
 
     private ?Post $post = null;
     private ?string $authorName = null;
+
+    public function __construct(
+        protected array $params,
+        protected ?AuthorRepositoryInterface $authorRepository,
+        protected ?PostRepositoryInterface $postRepository,
+        private readonly ConverterInterface $converter
+    ) {
+        parent::__construct($params, null, $authorRepository, $postRepository);
+    }
 
     public function getContext(): Context
     {
@@ -37,7 +49,7 @@ class PostDetails extends Controller
             return new Template\NotFound();
         }
 
-        return new Template\PostDetails();
+        return new Template\PostDetails($this->converter);
     }
 
     public function getStatus(): string
@@ -52,6 +64,10 @@ class PostDetails extends Controller
     protected function loadData(): void
     {
         if (! $this->params || ! $this->validateParams()) {
+            return;
+        }
+
+        if ($this->postRepository === null || $this->authorRepository === null) {
             return;
         }
 
