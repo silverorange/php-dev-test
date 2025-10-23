@@ -4,41 +4,25 @@ namespace silverorange\DevTest\Controller;
 
 use silverorange\DevTest\Context;
 use silverorange\DevTest\Template;
+use PDO;
+use silverorange\DevTest\Repository\AuthorRepositoryInterface;
+use silverorange\DevTest\Repository\PostRepositoryInterface;
 
 abstract class Controller
 {
-    protected \PDO $db;
-
     /**
-     * @var array<string>
+     * @param array<int, string> $params
+     * @param ?PDO $db
+     * @param ?AuthorRepositoryInterface $authorRepository
+     * @param ?PostRepositoryInterface $postRepository
      */
-    protected array $params = [];
-
-    /**
-     * @param \PDO  $db
-     * @param array<string> $params
-     */
-    public function __construct(\PDO $db, array $params)
-    {
-        $this->setDatabase($db)->setParams($params);
+    public function __construct(
+        protected array $params,
+        protected ?PDO $db,
+        protected ?AuthorRepositoryInterface $authorRepository,
+        protected ?PostRepositoryInterface $postRepository,
+    ) {
         $this->loadData();
-    }
-
-    public function setDatabase(\PDO $db): self
-    {
-        $this->db = $db;
-        return $this;
-    }
-
-    /**
-     * @param array<string> $params
-     *
-     * @return $this
-     */
-    public function setParams(array $params): self
-    {
-        $this->params = $params;
-        return $this;
     }
 
     public function getStatus(): string

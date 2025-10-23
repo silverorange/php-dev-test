@@ -1,14 +1,26 @@
 <?php
 
+/**
+ * @todo complete DI refactor to remove direct PDO usage in controllers
+ */
+
 namespace silverorange\DevTest;
+
+use PDO;
+use silverorange\DevTest\Controller;
+use silverorange\DevTest\Repository\PdoAuthorRepository;
+use silverorange\DevTest\Repository\PdoPostRepository;
 
 class App
 {
-    protected \PDO $db;
+    protected PdoAuthorRepository $authorRepository;
+    protected PdoPostRepository $postRepository;
 
-    public function __construct(\PDO $db)
-    {
-        $this->db = $db;
+    public function __construct(
+        private readonly PDO $db,
+    ) {
+        $this->authorRepository = new PdoAuthorRepository($this->db);
+        $this->postRepository = new PdoPostRepository($this->db);
     }
 
     public function run(): bool
@@ -35,20 +47,25 @@ class App
 
     protected function getController(string $path): Controller\Controller
     {
-        $controller = new Controller\NotFound($this->db, []);
+        $controller = new Controller\NotFound([], $this->db, null, null);
 
         // TODO: Do stuff like parse query params from $_GET here if required.
 
         // Switch to set up different context data for different URLs.
         if (preg_match('@^/?$@', $path) === 1) {
-            $controller = new Controller\Root($this->db, []);
+            $controller = new Controller\Root([], $this->db, null, null);
         } elseif (preg_match('@^/posts/?$@', $path) === 1) {
-            $controller = new Controller\PostIndex($this->db, []);
+            $controller = new Controller\PostIndex([], $this->db, null, null);
         } elseif (preg_match('@^/posts/([a-f0-9-]+)/?$@', $path, $params) === 1) {
             array_shift($params);
-            $controller = new Controller\PostDetails($this->db, $params);
+            $controller = new Controller\PostDetails(
+                $params,
+                null,
+                $this->authorRepository,
+                $this->postRepository
+            );
         } elseif (preg_match('@^/checkout/?$@', $path) === 1) {
-            $controller = new Controller\Checkout($this->db, []);
+            $controller = new Controller\Checkout([], $this->db, null, null);
         }
 
         return $controller;

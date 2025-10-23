@@ -4,17 +4,15 @@ namespace silverorange\DevTest\Controller;
 
 use silverorange\DevTest\Context;
 use silverorange\DevTest\Template;
-use silverorange\DevTest\Model;
+use silverorange\DevTest\Model\Post;
+use silverorange\DevTest\Schema\UuidValidatorTrait;
 
 class PostDetails extends Controller
 {
-    /**
-     * TODO: When this property is assigned in loadData this PHPStan override
-     * can be removed.
-     *
-     * @phpstan-ignore property.unusedType
-     */
-    private ?Model\Post $post = null;
+    use UuidValidatorTrait;
+
+    private ?Post $post = null;
+    private ?string $authorName = null;
 
     public function getContext(): Context
     {
@@ -23,9 +21,11 @@ class PostDetails extends Controller
         if ($this->post === null) {
             $context->title = 'Not Found';
             $context->content = "A post with id {$this->params[0]} was not found.";
+            $context->author = null;
         } else {
             $context->title = $this->post->title;
-            $context->content = $this->params[0];
+            $context->content = $this->post->body;
+            $context->author = $this->authorName;
         }
 
         return $context;
@@ -51,7 +51,29 @@ class PostDetails extends Controller
 
     protected function loadData(): void
     {
-        // TODO: Load post from database here. $this->params[0] is the post id.
-        $this->post = null;
+        if (! $this->params || ! $this->validateParams()) {
+            return;
+        }
+
+        $this->post = $this->postRepository->findById($this->params[0]) ?: null;
+
+        if ($this->post) {
+            $author = $this->authorRepository->findById($this->post->author) ?: null;
+            $this->authorName = $author->full_name ?? 'Unknown';
+        }
+    }
+
+    private function validateParams(): bool
+    {
+        if (! isset($this->params[0])) {
+            return false;
+        }
+
+        $id = trim($this->params[0]);
+        if ($id === '') {
+            return false;
+        }
+
+        return $this->isValidUuid($id);
     }
 }

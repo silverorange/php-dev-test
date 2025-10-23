@@ -6,6 +6,7 @@ class Post
 {
     /** @var array<int, string> */
     public const REQUIRED_FIELDS = ['id', 'title', 'body', 'created_at', 'modified_at', 'author'];
+
     /** @var array<int, string> */
     public const DATE_FIELDS = ['created_at', 'modified_at'];
 
@@ -19,6 +20,8 @@ class Post
     ) {}
 
     /**
+     * Factory method when instance serves as Data Transfer Object.
+     *
      * @param array<string, string> $data
      * */
     public static function fromArray(array $data): self
