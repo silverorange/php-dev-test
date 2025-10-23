@@ -6,7 +6,6 @@ use League\CommonMark\ConverterInterface;
 use silverorange\DevTest\Context;
 use silverorange\DevTest\Template;
 use silverorange\DevTest\ViewModel\PostWithAuthor;
-use silverorange\DevTest\Repository\AuthorRepositoryInterface;
 use silverorange\DevTest\Repository\PostRepositoryInterface;
 use silverorange\DevTest\Schema\UuidValidatorTrait;
 
@@ -19,11 +18,10 @@ class PostDetails extends Controller
 
     public function __construct(
         protected array $params,
-        protected ?AuthorRepositoryInterface $authorRepository,
         protected ?PostRepositoryInterface $postRepository,
         private readonly ConverterInterface $converter
     ) {
-        parent::__construct($params, null, $authorRepository, $postRepository);
+        parent::__construct($params, null, $postRepository);
     }
 
     public function getContext(): Context
@@ -65,7 +63,7 @@ class PostDetails extends Controller
             return;
         }
 
-        if ($this->postRepository === null || $this->authorRepository === null) {
+        if ($this->postRepository === null) {
             return;
         }
 

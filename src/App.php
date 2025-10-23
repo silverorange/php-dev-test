@@ -10,12 +10,10 @@ use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\ConverterInterface;
 use PDO;
 use silverorange\DevTest\Controller;
-use silverorange\DevTest\Repository\PdoAuthorRepository;
 use silverorange\DevTest\Repository\PdoPostRepository;
 
 class App
 {
-    protected PdoAuthorRepository $authorRepository;
     protected PdoPostRepository $postRepository;
 
     protected ConverterInterface $converter;
@@ -23,7 +21,6 @@ class App
     public function __construct(
         private readonly PDO $db,
     ) {
-        $this->authorRepository = new PdoAuthorRepository($this->db);
         $this->postRepository = new PdoPostRepository($this->db);
 
         $this->converter = new CommonMarkConverter();
@@ -53,29 +50,27 @@ class App
 
     protected function getController(string $path): Controller\Controller
     {
-        $controller = new Controller\NotFound([], $this->db, null, null);
+        $controller = new Controller\NotFound([], $this->db, null);
 
         // TODO: Do stuff like parse query params from $_GET here if required.
 
         // Switch to set up different context data for different URLs.
         if (preg_match('@^/?$@', $path) === 1) {
-            $controller = new Controller\Root([], $this->db, null, null);
+            $controller = new Controller\Root([], $this->db, null);
         } elseif (preg_match('@^/posts/?$@', $path) === 1) {
             $controller = new Controller\PostIndex(
                 [],
-                $this->authorRepository,
                 $this->postRepository
             );
         } elseif (preg_match('@^/posts/([a-f0-9-]+)/?$@', $path, $params) === 1) {
             array_shift($params);
             $controller = new Controller\PostDetails(
                 $params,
-                $this->authorRepository,
                 $this->postRepository,
                 $this->converter
             );
         } elseif (preg_match('@^/checkout/?$@', $path) === 1) {
-            $controller = new Controller\Checkout([], $this->db, null, null);
+            $controller = new Controller\Checkout([], $this->db, null);
         }
 
         return $controller;

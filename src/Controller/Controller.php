@@ -5,7 +5,6 @@ namespace silverorange\DevTest\Controller;
 use silverorange\DevTest\Context;
 use silverorange\DevTest\Template;
 use PDO;
-use silverorange\DevTest\Repository\AuthorRepositoryInterface;
 use silverorange\DevTest\Repository\PostRepositoryInterface;
 
 abstract class Controller
@@ -13,13 +12,11 @@ abstract class Controller
     /**
      * @param array<int, string> $params
      * @param ?PDO $db
-     * @param ?AuthorRepositoryInterface $authorRepository
      * @param ?PostRepositoryInterface $postRepository
      */
     public function __construct(
         protected array $params,
         protected ?PDO $db,
-        protected ?AuthorRepositoryInterface $authorRepository,
         protected ?PostRepositoryInterface $postRepository,
     ) {
         $this->loadData();

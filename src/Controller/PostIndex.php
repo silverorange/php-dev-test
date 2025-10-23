@@ -2,7 +2,6 @@
 
 namespace silverorange\DevTest\Controller;
 
-use silverorange\DevTest\Repository\AuthorRepositoryInterface;
 use silverorange\DevTest\Repository\PostRepositoryInterface;
 use silverorange\DevTest\Context;
 use silverorange\DevTest\Template;
@@ -15,10 +14,9 @@ class PostIndex extends Controller
 
     public function __construct(
         protected array $params,
-        protected ?AuthorRepositoryInterface $authorRepository,
         protected ?PostRepositoryInterface $postRepository,
     ) {
-        parent::__construct($params, null, $authorRepository, $postRepository);
+        parent::__construct($params, null, $postRepository);
     }
 
     public function getContext(): Context
@@ -37,7 +35,7 @@ class PostIndex extends Controller
 
     protected function loadData(): void
     {
-        if ($this->postRepository === null || $this->authorRepository === null) {
+        if ($this->postRepository === null) {
             return;
         }
 
