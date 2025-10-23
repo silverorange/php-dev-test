@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace silverorange\DevTest\Repository;
 
 use PDO;
-use silverorange\DevTest\Model\Post;
 use silverorange\DevTest\ViewModel\PostWithAuthor;
 
 final class PdoPostRepository implements PostRepositoryInterface
@@ -15,9 +14,15 @@ final class PdoPostRepository implements PostRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function findById(string $id): ?Post
+    public function findByIdWithAuthor(string $id): ?PostWithAuthor
     {
-        $stmt = $this->db->prepare("SELECT * FROM posts WHERE id = :id");
+        $sql = <<<'SQL'
+                SELECT p.*, a.full_name AS author_name
+                FROM posts p
+                LEFT JOIN authors a ON a.id = p.author
+                WHERE p.id = :id
+            SQL;
+        $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_STR);
 
         if (! $stmt->execute()) {
@@ -27,9 +32,18 @@ final class PdoPostRepository implements PostRepositoryInterface
         /** @var array<string, string> $row */
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return Post::fromArray($row);
-    }
+        $postWithAuthor = new PostWithAuthor(
+            id: (string) $row['id'],
+            title: (string) $row['title'],
+            body: (string) $row['body'],
+            created_at: (string) $row['created_at'],
+            modified_at: (string) $row['modified_at'],
+            author: (string) $row['author'],
+            author_name: (string) $row['author_name']
+        );
 
+        return $postWithAuthor;
+    }
 
     /**
      * @inheritDoc

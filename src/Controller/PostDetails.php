@@ -5,7 +5,7 @@ namespace silverorange\DevTest\Controller;
 use League\CommonMark\ConverterInterface;
 use silverorange\DevTest\Context;
 use silverorange\DevTest\Template;
-use silverorange\DevTest\Model\Post;
+use silverorange\DevTest\ViewModel\PostWithAuthor;
 use silverorange\DevTest\Repository\AuthorRepositoryInterface;
 use silverorange\DevTest\Repository\PostRepositoryInterface;
 use silverorange\DevTest\Schema\UuidValidatorTrait;
@@ -14,8 +14,8 @@ class PostDetails extends Controller
 {
     use UuidValidatorTrait;
 
-    private ?Post $post = null;
-    private ?string $authorName = null;
+    /** @var array<int, ?PostWithAuthor> */
+    private array $postsWithAuthor = [];
 
     public function __construct(
         protected array $params,
@@ -30,14 +30,12 @@ class PostDetails extends Controller
     {
         $context = new Context();
 
-        if ($this->post === null) {
+        if (! isset($this->postsWithAuthor[0])) {
             $context->title = 'Not Found';
             $context->content = "A post with id {$this->params[0]} was not found.";
-            $context->author = null;
         } else {
-            $context->title = $this->post->title;
-            $context->content = $this->post->body;
-            $context->author = $this->authorName;
+            $context->title = $this->postsWithAuthor[0]->title;
+            $context->postsWithAuthor = $this->postsWithAuthor;
         }
 
         return $context;
@@ -45,7 +43,7 @@ class PostDetails extends Controller
 
     public function getTemplate(): Template\Template
     {
-        if ($this->post === null) {
+        if (! isset($this->postsWithAuthor[0])) {
             return new Template\NotFound();
         }
 
@@ -54,7 +52,7 @@ class PostDetails extends Controller
 
     public function getStatus(): string
     {
-        if ($this->post === null) {
+        if (! isset($this->postsWithAuthor[0])) {
             return $this->getProtocol() . ' 404 Not Found';
         }
 
@@ -71,12 +69,7 @@ class PostDetails extends Controller
             return;
         }
 
-        $this->post = $this->postRepository->findById($this->params[0]) ?: null;
-
-        if ($this->post) {
-            $author = $this->authorRepository->findById($this->post->author) ?: null;
-            $this->authorName = $author->full_name ?? 'Unknown';
-        }
+        $this->postsWithAuthor[] = $this->postRepository->findByIdWithAuthor($this->params[0]) ?: null;
     }
 
     private function validateParams(): bool

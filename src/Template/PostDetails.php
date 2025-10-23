@@ -14,12 +14,20 @@ class PostDetails extends Layout
 
     protected function renderPage(Context $context): string
     {
-        $context->content = $this->converter->convert($context->content)->getContent();
+        if (! $context->postsWithAuthor || ! isset($context->postsWithAuthor[0])) {
+            return <<<HTML
+                <h1>{$context->title}</h1>
+                <p>{$context->content}</p>
+                HTML;
+        }
+
+        $body = $this->converter->convert($context->postsWithAuthor[0]->body)->getContent();
 
         return <<<HTML
             <h1>{$context->title}</h1>
-            <p>{$context->content}</p>
-            <p><em>Author: {$context->author}</em></p>
+            <p>{$body}</p>
+            <p><em>Author:</em> {$context->postsWithAuthor[0]->author_name}</p>
             HTML;
+
     }
 }

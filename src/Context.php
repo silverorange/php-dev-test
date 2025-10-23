@@ -12,8 +12,6 @@ class Context
 
     public string $content = '';
 
-    public ?string $author = null;
-
-    /** @var array<int, PostWithAuthor> */
+    /** @var array<int, ?PostWithAuthor> */
     public ?array $postsWithAuthor = null;
 }
