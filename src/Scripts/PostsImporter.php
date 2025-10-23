@@ -12,12 +12,11 @@ use RuntimeException;
 use SplFileInfo;
 use silverorange\DevTest\Config;
 use silverorange\DevTest\Database;
+use silverorange\DevTest\Model\Post;
 
 final class PostsImporter
 {
     private const DATA_DIR = __DIR__ . '/../../data';
-    private const REQUIRED_FIELDS = ['id', 'title', 'body', 'created_at', 'modified_at', 'author'];
-    private const DATE_FIELDS = ['created_at', 'modified_at'];
 
     public function __construct(private readonly PDO $db) {}
 
@@ -68,16 +67,19 @@ final class PostsImporter
                     throw new RuntimeException("Failed to read file contents.");
                 }
 
-                /** @var array<string, string> $post */
-                $post = json_decode($jsonData, true);
+                /** @var array<string, string> $jsonDataArray */
+                $jsonDataArray = json_decode($jsonData, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     throw new RuntimeException("Invalid JSON: " . json_last_error_msg());
                 }
 
-                $this->validateData($post);
+                $post = Post::fromArray($jsonDataArray);
+                if (! $post->validate()) {
+                    throw new RuntimeException("Post data validation failed.");
+                }
 
-                foreach (self::REQUIRED_FIELDS as $field) {
-                    $stmt->bindValue(":{$field}", $post[$field], PDO::PARAM_STR);
+                foreach (Post::REQUIRED_FIELDS as $field) {
+                    $stmt->bindValue(":{$field}", $post->$field, PDO::PARAM_STR);
                 }
                 try {
                     $stmt->execute();
@@ -110,25 +112,6 @@ final class PostsImporter
         }
         if (! $fileinfo->isReadable()) {
             throw new RuntimeException("File is not readable: " . $fileinfo->getFilename());
-        }
-    }
-
-    /**
-     * @param array<string, string> $post
-     * @return void
-     */
-    private function validateData(array $post): void
-    {
-        foreach (self::REQUIRED_FIELDS as $field) {
-            if (! isset($post[$field]) || trim((string) $post[$field]) === '') {
-                throw new RuntimeException("Missing or empty required field: {$field}");
-            }
-        }
-
-        foreach (self::DATE_FIELDS as $dateField) {
-            if (! strtotime($post[$dateField])) {
-                throw new RuntimeException("Invalid date format for {$dateField}");
-            }
         }
     }
 }
