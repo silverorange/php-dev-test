@@ -22,7 +22,8 @@
   "scripts": {
     "lint": "./vendor/bin/php-cs-fixer check -v",
     "phpstan": "./vendor/bin/phpstan analyze",
-    "start": "php -S localhost:8000 src/index.php"
+    "start": "docker compose up -d",
+    "stop": "docker compose down --remove-orphans"
   },
   "autoload": {
     "psr-4": {
