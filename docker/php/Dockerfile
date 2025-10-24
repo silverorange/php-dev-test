@@ -2,7 +2,7 @@
 
 # https://docs.docker.com/go/dockerfile-reference/
 
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 RUN apt-get update
 
